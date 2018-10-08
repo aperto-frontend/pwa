@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "live-server --port=3333 --open=./public --watch=./public"
+    "start": "live-server --wait=500 --entry-file=./public/index.html --cors --https=./https.js --host=localhost --port=3333 --open=./public/index.html --watch=./public"
   },
   "author": "",
   "license": "ISC",
