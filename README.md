@@ -2,6 +2,7 @@
 
 ### Development
 Use `npm start` to serve the public folder.
+Point to final folder in the start script in the package.json to see the final example.
 
 ### Agenda
 * Setup with favicon generator
