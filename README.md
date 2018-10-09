@@ -13,6 +13,15 @@ Point to final folder in the start script in the package.json to see the final e
 * fetch Event 
 * Optional: fetch with dynamic data (network then cache strategy)
 
+### SSH Keys
+Generate using openssl
+```
+openssl req -x509 -days 730 -out localhost.crt -keyout localhost.key \
+   -newkey rsa:2048 -nodes -sha256 \
+   -subj '/CN=localhost' -extensions EXT -config <( \
+    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+```
+
 ### Manifest
 ```json
 {
