@@ -1,17 +1,27 @@
 # Minimalistic PWA example
 
-### Development
-Use `npm start` to serve the public folder.
-Point to final folder in the start script in the package.json to see the final example.
-
 ### Agenda
 * Setup with favicon generator
 * Register ServiceWorker
+* DevTools ServiceWorker and Manifest Tools
 * install Event
-    * cache.addAll() if any fails all fail
 * activate Event
 * fetch Event 
 * Optional: fetch with dynamic data (network then cache strategy)
+
+### Development
+Use `npm i` and then `npm start` to serve the public folder.
+Point to final folder in the start script in the package.json to see the final example.
+
+### SSH Keys
+Generate using openssl
+```
+openssl req -x509 -days 730 -out localhost.crt -keyout localhost.key \
+   -newkey rsa:2048 -nodes -sha256 \
+   -subj '/CN=localhost' -extensions EXT -config <( \
+    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+```
+To trust the certificate locally on a MAC open keychain app and add the certificate file
 
 ### Manifest
 ```json
@@ -58,9 +68,11 @@ self.addEventListener('fetch', function(event) {
 });
 ```
 
+### Tools
+* [Favicon Generator](https://realfavicongenerator.net/)
+
 ### Related Documentations and Tools
 * [A minimal PWA](https://mobiforge.com/design-development/pwa-minimus-a-minimal-pwa-checklist)
-* [Favicon Generator](https://realfavicongenerator.net/)
 * [W3C Web App Manifest](https://www.w3.org/TR/appmanifest/)
 * [Tutorial: Your First Progressive Web App from Google](https://developers.google.com/web/fundamentals/codelabs/your-first-pwapp/)
 
