@@ -1,6 +1,6 @@
-var appShellCacheVersion = 2;
+var appShellCacheVersion = 1;
 var appShellCacheName = 'mini-pwa-app-shell-v' + appShellCacheVersion.toString();
-var contentDataCacheVersion = 2;
+var contentDataCacheVersion = 1;
 var contentDataCacheName = 'mini-pwa-content-data-v' + contentDataCacheVersion.toString();
 var appShellFilesToCache = [
     './',
@@ -16,11 +16,22 @@ var appShellFilesToCache = [
     './android-chrome-512x512.png'
 ];
 
-self.addEventListener('activate', function(e) {
+self.addEventListener('install', function(event) {
+    console.log('ServiceWorker Install');
+    event.waitUntil(
+        caches.open(appShellCacheName).then(function(cache) {
+            console.log('ServiceWorker Caching app shell', appShellFilesToCache);
+            return cache.addAll(appShellFilesToCache);
+        })
+    );
+});
+
+self.addEventListener('activate', function(event) {
     console.log('ServiceWorker Activate');
-    e.waitUntil(
+    event.waitUntil(
         caches.keys().then(function(keyList) {
             return Promise.all(keyList.map(function(key) {
+                console.log('cacheKey', key);
                 if (key !== appShellCacheName && key !== contentDataCacheName) {
                     console.log('ServiceWorker Removing old cache', key);
                     return caches.delete(key);
@@ -31,24 +42,6 @@ self.addEventListener('activate', function(e) {
     return self.clients.claim();
 });
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(appShellCacheName).then(function(cache) {
-            console.log('ServiceWorker Caching app shell', appShellFilesToCache);
-            return cache.addAll(appShellFilesToCache);
-        })
-    );
-});
-/*
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
-});
-*/
-
 self.addEventListener('fetch', function(event) {
     console.log('ServiceWorker Install', event.request);
     var requestUrl = event.request.url;
@@ -57,6 +50,7 @@ self.addEventListener('fetch', function(event) {
         event.respondWith(
             caches.match(event.request)
                 .then(function(response) {
+                    // Cache then Network strategy
                     // Cache hit - return response
                     if (response) {
                         return response;
@@ -70,7 +64,7 @@ self.addEventListener('fetch', function(event) {
 
                     return fetch(fetchRequest).then(
                         function(response) {
-                            // Check if we received a valid response
+                            // Check if we received an invalid response
                             if(!response || response.status !== 200 || response.type !== 'basic') {
                                 return response;
                             }
@@ -81,11 +75,13 @@ self.addEventListener('fetch', function(event) {
                             // to clone it so we have two streams.
                             var responseToCache = response.clone();
 
+                            // Save the response to the cache with the specified name
                             caches.open(contentDataCacheName)
                                 .then(function(cache) {
                                     cache.put(event.request, responseToCache);
                                 });
 
+                            // Return the response
                             return response;
                         }
                     );
